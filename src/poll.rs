@@ -8,7 +8,7 @@ use std::{mem, ops, isize};
 use std::os::unix::io::AsRawFd;
 #[cfg(all(unix, not(target_os = "fuchsia")))]
 use std::os::unix::io::RawFd;
-use std::sync::{Arc, SgxMutex, SgxCondvar};
+use std::sync::{Arc, Mutex, Condvar};
 use std::sync::atomic::{AtomicUsize, AtomicPtr, AtomicBool};
 use std::sync::atomic::Ordering::{self, Acquire, Release, AcqRel, Relaxed, SeqCst};
 use std::time::{Duration, Instant};
@@ -339,10 +339,10 @@ pub struct Poll {
     lock_state: AtomicUsize,
 
     // Sequences concurrent calls to `Poll::poll`
-    lock: SgxMutex<()>,
+    lock: Mutex<()>,
 
     // Wakeup the next waiter
-    condvar: SgxCondvar,
+    condvar: Condvar,
 }
 
 /// Handle to a user space `Poll` registration.
@@ -658,8 +658,8 @@ impl Poll {
             selector: sys::Selector::new()?,
             readiness_queue: ReadinessQueue::new()?,
             lock_state: AtomicUsize::new(0),
-            lock: SgxMutex::new(()),
-            condvar: SgxCondvar::new(),
+            lock: Mutex::new(()),
+            condvar: Condvar::new(),
         };
 
         // Register the notification wakeup FD with the IO poller
@@ -2069,7 +2069,7 @@ impl Clone for RegistrationInner {
         // We abort because such a program is incredibly degenerate, and we
         // don't care to support it.
         if old_size & !MAX_REFCOUNT != 0 {
-            sgx_trts::trts::rsgx_abort();
+            sgx_trts::error::abort();
         }
 
         RegistrationInner {

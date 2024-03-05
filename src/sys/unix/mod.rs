@@ -72,7 +72,7 @@ pub fn pipe() -> ::io::Result<(Io, Io)> {
     //}
     let flags = libc::O_NONBLOCK | libc::O_CLOEXEC;
     unsafe {
-        cvt(libc::ocall::pipe2(pipes.as_mut_ptr(), flags))?;
+        cvt(libc::ocall::pipe2(&mut pipes, flags))?;
         Ok((Io::from_raw_fd(pipes[0]), Io::from_raw_fd(pipes[1])))
     }
 }
