@@ -28,7 +28,7 @@ default = ["mesalock_sgx"]
 mesalock_sgx = ["sgx_tstd", "sgx_trts", "sgx_libc"]
 
 [dependencies]
-log = { git = "https://github.com/mesalock-linux/log-sgx" }
+log = { git = "https://github.com/Kailai-Wang/log-sgx", branch = "sgx-sdk-2.0.0" }
 slab = { git = "https://github.com/mesalock-linux/slab-sgx" }
 net2 = { git = "https://github.com/Kailai-Wang/net2-rs-sgx", branch =  "sgx-sdk-2.0.0" }
 iovec = { git = "https://github.com/mesalock-linux/iovec-sgx" }
